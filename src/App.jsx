@@ -1,39 +1,84 @@
-import './App.css'
-import { useState, useEffect } from 'react'
-import TodoList from './components/TodoList'
-import InputComponent from './components/InputComponent'
+import { useState, useEffect } from "react";
+import Todo from "./components/Todo";
+import Test from "./components/Test";
+import "./App.css";
 
 function App() {
-
-  const [newTodo, setNewTodo] = useState("")
-  // const [input2, setInput2] = useState("")
-  const [todos, setTodos] = useState([])
-
-  useEffect(() => {
-    console.log("Hey, I have an empty deppendency array, I am excellent for fetching data...")
-  }, [])
+  const [todos, setTodos] = useState([]);
+  const [showTest, setShowTest] = useState(true);
+  const [showFOrm, setShowForm] = useState(false);
 
   useEffect(() => {
-    console.log("I will run after every state change and the innitial loading of the page");
-  })
+    console.log("Valami, useEffect");
 
+    return () => {
+      console.log("Unmount");
+    };
+  }, []);
 
-  function handleSubmit(event) {
-    event.preventDefault()
-    setTodos([...todos, event.target.todoInput.value])
-    // setTodos((prevState) => [...prevState, event.target.todoInput.value])
+  // useEffect(() => {
+  //   console.log("State has changed!");
+  // })
+
+  useEffect(() => {
+    if (todos.length > 0 && showTest == false) {
+      setShowForm(true);
+    }
+  }, [showTest, todos]);
+
+  function handleSubmit(e) {
+    e.preventDefault();
+
+    setTodos((prevState) => {
+      return [...prevState, e.target.newTodo.value];
+    });
   }
 
-  return (
-    <main>
-      <form className='TodoForm' onSubmit={(e) => { handleSubmit(e) }}>
-        <InputComponent data={newTodo} setter={setNewTodo} />
-        {/* <input name="todoInput2" className='TodoInput' onChange={(event) => setInput2(event.target.value)}/> */}
-        <button type='submit' className='AddNewTodo'>Click me!</button>
-        <TodoList todos={todos} />
-      </form>
-    </main>
-  )
+  function handleTest() {
+    setShowTest(!showTest);
+  }
+
+  function handleReplace() {
+    setTodos([...todos.sort((a, b) => a.localeCompare(b))]);
+  }
+  console.log(todos);
+
+  if (!showFOrm) {
+    return (
+      <div>
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="newTodoInput">Your new Todo:</label>
+          <input name="newTodo" id="newTodoInput" type="text"></input>
+          <button type="submit">Register todo!</button>
+        </form>
+        {todos.length == 0 ? (
+          <h1>You don't have any todos</h1>
+        ) : (
+          todos.map((nextTodo, index) => (
+            <Todo key={nextTodo + index} todoString={nextTodo}></Todo>
+          ))
+        )}
+        <button onClick={handleReplace}>Replace</button>
+        <button onClick={handleTest}>Test</button>
+        {showTest ? <Test></Test> : null}
+      </div>
+    );
+  }
+
+  if (showFOrm) {
+    return <div>
+      {todos.length == 0 ? (
+        <h1>You don't have any todos</h1>
+      ) : (
+        todos.map((nextTodo, index) => (
+          <Todo key={nextTodo + index} todoString={nextTodo}></Todo>
+        ))
+      )}
+      <button onClick={handleReplace}>Replace</button>
+      <button onClick={handleTest}>Test</button>
+      {showTest ? <Test></Test> : null}
+    </div>;
+  }
 }
 
-export default App
+export default App;
