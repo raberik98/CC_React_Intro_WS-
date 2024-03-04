@@ -1,84 +1,41 @@
-import { useState, useEffect } from "react";
-import Todo from "./components/Todo";
-import Test from "./components/Test";
-import "./App.css";
+import TodoForm from "./components/TodoForm"
+import TodoList from "./components/TodoList"
+
+import { useState, useEffect } from "react"
 
 function App() {
-  const [todos, setTodos] = useState([]);
-  const [showTest, setShowTest] = useState(true);
-  const [showFOrm, setShowForm] = useState(false);
+  const [todos, setTodos] = useState([
+    {label: "First todo", id: 1},
+    {label: "Second todo", id: 2},
+    {label: "Third todo", id: 3},
+  ])
+
+  const [displayTodos, setDisplayTodos] = useState(true)
 
   useEffect(() => {
-    console.log("Valami, useEffect");
+    console.log("Mounted");
 
-    return () => {
-      console.log("Unmount");
-    };
-  }, []);
-
-  // useEffect(() => {
-  //   console.log("State has changed!");
-  // })
-
-  useEffect(() => {
-    if (todos.length > 0 && showTest == false) {
-      setShowForm(true);
-    }
-  }, [showTest, todos]);
+    return () => console.log("Unmounted");
+  }, [])
 
   function handleSubmit(e) {
-    e.preventDefault();
+    try {
+      e.preventDefault()
 
-    setTodos((prevState) => {
-      return [...prevState, e.target.newTodo.value];
-    });
+      // setTodos([...todos, { label: "Fourth todo", id: 4 }])
+      setTodos((prevStates) => [...prevStates, { label: e.target.todoLabel.value, id: prevStates[prevStates.length-1].id +1 }])
+    } catch (error) {
+      alert(error)
+    }
   }
 
-  function handleTest() {
-    setShowTest(!showTest);
-  }
-
-  function handleReplace() {
-    setTodos([...todos.sort((a, b) => a.localeCompare(b))]);
-  }
-  console.log(todos);
-
-  if (!showFOrm) {
-    return (
-      <div>
-        <form onSubmit={handleSubmit}>
-          <label htmlFor="newTodoInput">Your new Todo:</label>
-          <input name="newTodo" id="newTodoInput" type="text"></input>
-          <button type="submit">Register todo!</button>
-        </form>
-        {todos.length == 0 ? (
-          <h1>You don't have any todos</h1>
-        ) : (
-          todos.map((nextTodo, index) => (
-            <Todo key={nextTodo + index} todoString={nextTodo}></Todo>
-          ))
-        )}
-        <button onClick={handleReplace}>Replace</button>
-        <button onClick={handleTest}>Test</button>
-        {showTest ? <Test></Test> : null}
-      </div>
-    );
-  }
-
-  if (showFOrm) {
-    return <div>
-      {todos.length == 0 ? (
-        <h1>You don't have any todos</h1>
-      ) : (
-        todos.map((nextTodo, index) => (
-          <Todo key={nextTodo + index} todoString={nextTodo}></Todo>
-        ))
-      )}
-      <button onClick={handleReplace}>Replace</button>
-      <button onClick={handleTest}>Test</button>
-      {showTest ? <Test></Test> : null}
-    </div>;
-  }
+  return (
+    <main>
+      <TodoForm handleSubmit={handleSubmit} />
+      {displayTodos ? <TodoList todos={todos} /> : null}
+      <button onClick={() => setDisplayTodos(!displayTodos)}>Hide Todos</button>
+    </main>
+  )
 }
 
-export default App;
+export default App
